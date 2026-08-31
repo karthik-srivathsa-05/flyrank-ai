@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Predicting Content Performance Decline for Review Prioritization</title>
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        line-height: 1.65;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 24px;
+        color: #222;
+        background: #fff;
+    }
+
+    h1 {
+        font-size: 36px;
+        line-height: 1.2;
+        margin-bottom: 12px;
+    }
+
+    h2 {
+        margin-top: 48px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 8px;
+    }
+
+    h3 {
+        margin-top: 30px;
+    }
+
+    .subtitle {
+        color: #666;
+        font-size: 18px;
+        margin-bottom: 30px;
+    }
+
+    .callout {
+        background: #f5f5f5;
+        border-left: 4px solid #333;
+        padding: 16px 20px;
+        margin: 24px 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background: #f3f3f3;
+    }
+
+    .metric {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .small {
+        color: #666;
+        font-size: 14px;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+        margin: 15px 0 30px 0;
+    }
+
+    code {
+        background: #f2f2f2;
+        padding: 2px 5px;
+        border-radius: 3px;
+    }
+
+    footer {
+        margin-top: 60px;
+        padding-top: 25px;
+        border-top: 1px solid #ddd;
+        color: #666;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Predicting Content Performance Decline for Review Prioritization</h1>
+
+<p class="subtitle">
+A decision-support study using anonymized search-performance data
+</p>
+
+
+<h2>Abstract</h2>
+
+<p>
+This study evaluates whether a simple supervised learning model can help prioritize
+content pages for review when recent performance shows signals associated with future
+decline. The decision point is the end of February 2026. February performance signals
+are used as model features, while March performance is used only to define the outcome.
+</p>
+
+<p>
+A Logistic Regression model is compared with a transparent rule-based baseline using
+a client-grouped train/test split. The model achieved a ROC-AUC of <strong>0.6286</strong>
+compared with <strong>0.6194</strong> for the baseline. Average Precision was
+<strong>0.4721</strong> for the model versus <strong>0.4704</strong> for the baseline.
+The results indicate a small directional improvement in ranking ability, but not a
+large predictive advantage.
+</p>
+
+<p>
+The resulting scores are best treated as a review-prioritization signal rather than
+a hard prediction or causal recommendation.
+</p>
+
+
+<h2>1. Research Question</h2>
+
+<p>
+Can February search-performance signals identify pages that are more likely to
+experience a defined decline in March, so that an SEO or content team can prioritize
+which pages to review first?
+</p>
+
+<div class="callout">
+<strong>Decision supported:</strong>
+Use the model score to rank pages for human review. The score does not determine
+whether a page should definitely be refreshed.
+</div>
+
+
+<h2>2. Data</h2>
+
+<p>
+The analysis uses the anonymized FlyRank internship warehouse hosted on Hugging Face.
+The February performance table contains approximately 7.36 million daily observations,
+covering February 1–28, 2026. The March table contains approximately 9.84 million
+daily observations, covering March 1–31, 2026.
+</p>
+
+<p>
+The modeling table contains <strong>55,090</strong> client-content observations after
+constructing February features and requiring a positive February click baseline.
+</p>
+
+<p>
+The final feature set contains four February-only signals:
+</p>
+
+<ul>
+<li><code>impressions_30d</code></li>
+<li><code>clicks_30d</code></li>
+<li><code>avg_position</code></li>
+<li><code>days_with_impressions</code></li>
+</ul>
+
+<p>
+Client and content identifiers are retained for grouping and reporting but are not
+used as predictive features.
+</p>
+
+
+<h2>3. Methodology</h2>
+
+<h3>Decision cutoff</h3>
+
+<p>
+The decision point is February 28, 2026. Only information available by that point
+is used as a model feature.
+</p>
+
+<h3>Label</h3>
+
+<p>
+An observation is labelled as a decline when March clicks fall below 70% of its
+February click baseline. This corresponds to a decline of more than 30%.
+</p>
+
+<h3>Model</h3>
+
+<p>
+Logistic Regression was selected because the task is binary classification and the
+result needs to remain interpretable for a content-review queue. Numeric features
+are median-imputed using training data and standardized before fitting the model.
+</p>
+
+<h3>Validation</h3>
+
+<p>
+A grouped train/test split was performed by client. All observations belonging to a
+client remain entirely within either the training set or the test set. This prevents
+pages from the same client appearing in both sets.
+</p>
+
+<p>
+The training set contains <strong>34,860</strong> observations and the test set
+contains <strong>20,230</strong>. Client overlap between the two sets was zero.
+</p>
+
+<h3>Leakage check</h3>
+
+<p>
+The model uses only February-derived features. March clicks and the decline label
+are excluded from the feature matrix. The leakage check passed.
+</p>
+
+
+<h2>4. Results vs Baseline</h2>
+
+<table>
+<tr>
+    <th>Method</th>
+    <th>ROC-AUC</th>
+    <th>Average Precision</th>
+</tr>
+
+<tr>
+    <td>Week-4 baseline</td>
+    <td>0.6194</td>
+    <td>0.4704</td>
+</tr>
+
+<tr>
+    <td>Logistic Regression</td>
+    <td>0.6286</td>
+    <td>0.4721</td>
+</tr>
+
+<tr>
+    <td><strong>Model minus baseline</strong></td>
+    <td><strong>+0.0092</strong></td>
+    <td><strong>+0.0017</strong></td>
+</tr>
+</table>
+
+<p>
+The Logistic Regression model improves ROC-AUC by 0.0092 over the transparent
+baseline. Average Precision improves by only 0.0017. This is a small improvement,
+so the result should be interpreted as directional evidence that the learned ranking
+contains some additional signal rather than as a major predictive improvement.
+</p>
+
+
+<h2>5. Errors and Interpretation</h2>
+
+<p>
+At the 0.50 classification threshold, the model correctly classified 12,950 of
+20,230 test observations. There were 6,420 false negatives and 860 false positives.
+</p>
+
+<p>
+The large number of false negatives demonstrates why the model should not be treated
+as a hard yes/no decision system. Its more useful role is ranking pages by estimated
+decline probability.
+</p>
+
+<p>
+The largest absolute Logistic Regression coefficient was associated with
+<code>impressions_30d</code>, followed by <code>avg_position</code>. Within this
+fitted model, lower February impression volume and weaker average position were
+associated with higher estimated decline probability.
+</p>
+
+<p>
+These are measured associations in this dataset. They do not establish that changing
+either variable would cause future performance to improve.
+</p>
+
+
+<h2>6. Limitations</h2>
+
+<ul>
+<li>The model is trained and evaluated on one February-to-March observation window.</li>
+<li>The label is a proxy for decline rather than a direct measure of content quality.</li>
+<li>The model does not establish causality.</li>
+<li>The small improvement over the baseline limits the strength of the predictive claim.</li>
+<li>The model should support human prioritization rather than replace editorial judgment.</li>
+<li>The evaluation does not demonstrate that refreshing a selected page will improve performance.</li>
+<li>Results may change on another time period, population, or data release.</li>
+</ul>
+
+
+<h2>7. Ranked Recommendations</h2>
+
+<p>
+The model produces a ranked review queue using predicted decline probability.
+The highest-ranked pages should be treated as candidates for investigation rather
+than automatic refresh targets.
+</p>
+
+<table>
+<tr>
+    <th>Priority</th>
+    <th>Predicted decline probability</th>
+    <th>Priority band</th>
+    <th>February impressions</th>
+    <th>February clicks</th>
+    <th>Average position</th>
+</tr>
+
+<tr>
+    <td>1</td>
+    <td>0.7989</td>
+    <td>Highest</td>
+    <td>112</td>
+    <td>1</td>
+    <td>81.12</td>
+</tr>
+
+<tr>
+    <td>2</td>
+    <td>0.7984</td>
+    <td>Highest</td>
+    <td>201</td>
+    <td>1</td>
+    <td>77.08</td>
+</tr>
+
+<tr>
+    <td>3</td>
+    <td>0.7815</td>
+    <td>Highest</td>
+    <td>149</td>
+    <td>1</td>
+    <td>76.46</td>
+</tr>
+
+<tr>
+    <td>4</td>
+    <td>0.7690</td>
+    <td>Highest</td>
+    <td>29</td>
+    <td>1</td>
+    <td>61.54</td>
+</tr>
+
+<tr>
+    <td>5</td>
+    <td>0.7635</td>
+    <td>Highest</td>
+    <td>43</td>
+    <td>1</td>
+    <td>64.54</td>
+</tr>
+</table>
+
+<p>
+Recommended workflow:
+</p>
+
+<ol>
+<li>Start with the highest-ranked pages.</li>
+<li>Review their February performance signals and recent content context.</li>
+<li>Decide whether a refresh or further investigation is justified.</li>
+<li>Record the action taken.</li>
+<li>Measure subsequent performance before treating the intervention as successful.</li>
+</ol>
+
+
+<h2>8. Artifacts</h2>
+
+<p>
+The analysis produced the following supporting artifacts:
+</p>
+
+<ul>
+<li>Model-versus-baseline comparison</li>
+<li>Decline-label distribution</li>
+<li>Logistic Regression coefficient analysis</li>
+<li>Predicted probability distribution</li>
+<li>Ranked recommendation queue</li>
+</ul>
+
+<p>
+The numerical results reported on this page are generated from the completed capstone
+notebook and its artifact outputs.
+</p>
+
+
+<h2>9. Conclusion</h2>
+
+<p>
+The experiment provides modest evidence that a Logistic Regression model using
+February search-performance signals can improve ranking of pages associated with
+the defined March decline compared with a transparent rule-based baseline.
+</p>
+
+<p>
+The measured improvement is small, so the main practical value is not a claim of
+high prediction accuracy. Instead, the model provides an interpretable ranking
+signal that can help a content team decide where to begin a review queue.
+</p>
+
+<p>
+The appropriate next step would be to test the approach across additional time
+windows and evaluate whether acting on the ranked recommendations produces useful
+downstream outcomes.
+</p>
+
+
+<footer>
+
+<h2>Acknowledgments &amp; Data Credit</h2>
+
+<p>
+This project was completed as part of the FlyRank ML Internship using the provided
+anonymized internship warehouse and project framework.
+</p>
+
+<p>
+Data and project credit:
+<a href="https://flyrank.ai" target="_blank">https://flyrank.ai</a>
+</p>
+
+</footer>
+
+</body>
+</html>
