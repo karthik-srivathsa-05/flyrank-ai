@@ -7,89 +7,105 @@
 <title>Predicting Content Performance Decline for Review Prioritization</title>
 
 <style>
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        line-height: 1.65;
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 40px 24px;
-        color: #222;
-        background: #fff;
-    }
 
-    h1 {
-        font-size: 36px;
-        line-height: 1.2;
-        margin-bottom: 12px;
-    }
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.7;
+    max-width: 1050px;
+    margin: auto;
+    padding: 45px 25px;
+    color: #222;
+    background: #ffffff;
+}
 
-    h2 {
-        margin-top: 48px;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 8px;
-    }
+h1 {
+    font-size: 38px;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
 
-    h3 {
-        margin-top: 30px;
-    }
+h2 {
+    margin-top: 55px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ddd;
+}
 
-    .subtitle {
-        color: #666;
-        font-size: 18px;
-        margin-bottom: 30px;
-    }
+h3 {
+    margin-top: 30px;
+}
 
-    .callout {
-        background: #f5f5f5;
-        border-left: 4px solid #333;
-        padding: 16px 20px;
-        margin: 24px 0;
-    }
+.subtitle {
+    color: #666;
+    font-size: 18px;
+    margin-bottom: 35px;
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-    }
+.callout {
+    background: #f5f5f5;
+    border-left: 4px solid #333;
+    padding: 18px 22px;
+    margin: 25px 0;
+}
 
-    th, td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: left;
-    }
+figure {
+    margin: 35px 0;
+}
 
-    th {
-        background: #f3f3f3;
-    }
+figure img {
+    display: block;
+    max-width: 900px;
+    width: 100%;
+    margin: auto;
+    border: 1px solid #ddd;
+}
 
-    .metric {
-        font-size: 20px;
-        font-weight: bold;
-    }
+figcaption {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 10px;
+}
 
-    .small {
-        color: #666;
-        font-size: 14px;
-    }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+}
 
-    img {
-        max-width: 100%;
-        height: auto;
-        margin: 15px 0 30px 0;
-    }
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 11px;
+    text-align: left;
+}
 
-    code {
-        background: #f2f2f2;
-        padding: 2px 5px;
-        border-radius: 3px;
-    }
+th {
+    background: #f3f3f3;
+}
 
-    footer {
-        margin-top: 60px;
-        padding-top: 25px;
-        border-top: 1px solid #ddd;
-        color: #666;
-    }
+ul,
+ol {
+    padding-left: 25px;
+}
+
+code {
+    background: #f2f2f2;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.metric {
+    font-size: 21px;
+    font-weight: bold;
+}
+
+footer {
+    margin-top: 65px;
+    padding-top: 30px;
+    border-top: 1px solid #ddd;
+    color: #666;
+}
+
 </style>
 </head>
 
@@ -113,16 +129,16 @@ are used as model features, while March performance is used only to define the o
 
 <p>
 A Logistic Regression model is compared with a transparent rule-based baseline using
-a client-grouped train/test split. The model achieved a ROC-AUC of <strong>0.6286</strong>
-compared with <strong>0.6194</strong> for the baseline. Average Precision was
-<strong>0.4721</strong> for the model versus <strong>0.4704</strong> for the baseline.
-The results indicate a small directional improvement in ranking ability, but not a
-large predictive advantage.
+a client-grouped train/test split. The model achieved a ROC-AUC of
+<strong>0.6286</strong> compared with <strong>0.6194</strong> for the baseline.
+Average Precision was <strong>0.4721</strong> for the model versus
+<strong>0.4704</strong> for the baseline.
 </p>
 
 <p>
-The resulting scores are best treated as a review-prioritization signal rather than
-a hard prediction or causal recommendation.
+The results indicate a small directional improvement in ranking ability, but not a
+large predictive advantage. The resulting scores are therefore best treated as a
+review-prioritization signal rather than a hard prediction or causal recommendation.
 </p>
 
 
@@ -155,9 +171,7 @@ The modeling table contains <strong>55,090</strong> client-content observations 
 constructing February features and requiring a positive February click baseline.
 </p>
 
-<p>
-The final feature set contains four February-only signals:
-</p>
+<p>The final feature set contains four February-only signals:</p>
 
 <ul>
 <li><code>impressions_30d</code></li>
@@ -170,6 +184,14 @@ The final feature set contains four February-only signals:
 Client and content identifiers are retained for grouping and reporting but are not
 used as predictive features.
 </p>
+
+<figure>
+<img src="assets/decline_label_distribution.png"
+     alt="Distribution of the decline label">
+<figcaption>
+Figure 1. Distribution of the defined March decline label.
+</figcaption>
+</figure>
 
 
 <h2>3. Methodology</h2>
@@ -200,8 +222,7 @@ are median-imputed using training data and standardized before fitting the model
 
 <p>
 A grouped train/test split was performed by client. All observations belonging to a
-client remain entirely within either the training set or the test set. This prevents
-pages from the same client appearing in both sets.
+client remain entirely within either the training set or the test set.
 </p>
 
 <p>
@@ -221,43 +242,56 @@ are excluded from the feature matrix. The leakage check passed.
 
 <table>
 <tr>
-    <th>Method</th>
-    <th>ROC-AUC</th>
-    <th>Average Precision</th>
+<th>Method</th>
+<th>ROC-AUC</th>
+<th>Average Precision</th>
 </tr>
 
 <tr>
-    <td>Week-4 baseline</td>
-    <td>0.6194</td>
-    <td>0.4704</td>
+<td>Week-4 baseline</td>
+<td>0.6194</td>
+<td>0.4704</td>
 </tr>
 
 <tr>
-    <td>Logistic Regression</td>
-    <td>0.6286</td>
-    <td>0.4721</td>
+<td>Logistic Regression</td>
+<td>0.6286</td>
+<td>0.4721</td>
 </tr>
 
 <tr>
-    <td><strong>Model minus baseline</strong></td>
-    <td><strong>+0.0092</strong></td>
-    <td><strong>+0.0017</strong></td>
+<td><strong>Model minus baseline</strong></td>
+<td><strong>+0.0092</strong></td>
+<td><strong>+0.0017</strong></td>
 </tr>
 </table>
 
+<figure>
+<img src="assets/model_vs_baseline.png"
+     alt="Model versus baseline performance">
+<figcaption>
+Figure 2. Logistic Regression performance compared with the Week-4 baseline.
+</figcaption>
+</figure>
+
 <p>
 The Logistic Regression model improves ROC-AUC by 0.0092 over the transparent
-baseline. Average Precision improves by only 0.0017. This is a small improvement,
-so the result should be interpreted as directional evidence that the learned ranking
-contains some additional signal rather than as a major predictive improvement.
+baseline. Average Precision improves by only 0.0017.
+</p>
+
+<p>
+This is a small improvement, so the result should be interpreted as directional
+evidence that the learned ranking contains some additional signal rather than as a
+major predictive improvement.
 </p>
 
 
 <h2>5. Errors and Interpretation</h2>
 
 <p>
-At the 0.50 classification threshold, the model correctly classified 12,950 of
-20,230 test observations. There were 6,420 false negatives and 860 false positives.
+At the 0.50 classification threshold, the model correctly classified
+<strong>12,950</strong> of 20,230 test observations. There were
+<strong>6,420 false negatives</strong> and <strong>860 false positives</strong>.
 </p>
 
 <p>
@@ -268,10 +302,18 @@ decline probability.
 
 <p>
 The largest absolute Logistic Regression coefficient was associated with
-<code>impressions_30d</code>, followed by <code>avg_position</code>. Within this
-fitted model, lower February impression volume and weaker average position were
-associated with higher estimated decline probability.
+<code>impressions_30d</code>, followed by <code>avg_position</code>.
+Within this fitted model, lower February impression volume and weaker average
+position were associated with higher estimated decline probability.
 </p>
+
+<figure>
+<img src="assets/logistic_coefficients.png"
+     alt="Logistic Regression feature coefficients">
+<figcaption>
+Figure 3. Logistic Regression coefficients for the four February features.
+</figcaption>
+</figure>
 
 <p>
 These are measured associations in this dataset. They do not establish that changing
@@ -302,63 +344,70 @@ than automatic refresh targets.
 
 <table>
 <tr>
-    <th>Priority</th>
-    <th>Predicted decline probability</th>
-    <th>Priority band</th>
-    <th>February impressions</th>
-    <th>February clicks</th>
-    <th>Average position</th>
+<th>Priority</th>
+<th>Predicted probability</th>
+<th>Priority band</th>
+<th>Impressions</th>
+<th>Clicks</th>
+<th>Avg. position</th>
 </tr>
 
 <tr>
-    <td>1</td>
-    <td>0.7989</td>
-    <td>Highest</td>
-    <td>112</td>
-    <td>1</td>
-    <td>81.12</td>
+<td>1</td>
+<td>0.7989</td>
+<td>Highest</td>
+<td>112</td>
+<td>1</td>
+<td>81.12</td>
 </tr>
 
 <tr>
-    <td>2</td>
-    <td>0.7984</td>
-    <td>Highest</td>
-    <td>201</td>
-    <td>1</td>
-    <td>77.08</td>
+<td>2</td>
+<td>0.7984</td>
+<td>Highest</td>
+<td>201</td>
+<td>1</td>
+<td>77.08</td>
 </tr>
 
 <tr>
-    <td>3</td>
-    <td>0.7815</td>
-    <td>Highest</td>
-    <td>149</td>
-    <td>1</td>
-    <td>76.46</td>
+<td>3</td>
+<td>0.7815</td>
+<td>Highest</td>
+<td>149</td>
+<td>1</td>
+<td>76.46</td>
 </tr>
 
 <tr>
-    <td>4</td>
-    <td>0.7690</td>
-    <td>Highest</td>
-    <td>29</td>
-    <td>1</td>
-    <td>61.54</td>
+<td>4</td>
+<td>0.7690</td>
+<td>Highest</td>
+<td>29</td>
+<td>1</td>
+<td>61.54</td>
 </tr>
 
 <tr>
-    <td>5</td>
-    <td>0.7635</td>
-    <td>Highest</td>
-    <td>43</td>
-    <td>1</td>
-    <td>64.54</td>
+<td>5</td>
+<td>0.7635</td>
+<td>Highest</td>
+<td>43</td>
+<td>1</td>
+<td>64.54</td>
 </tr>
+
 </table>
 
-<p>
-Recommended workflow:
-</p>
+<figure>
+<img src="assets/predicted_probability_distribution.png"
+     alt="Distribution of predicted decline probabilities">
+<figcaption>
+Figure 4. Distribution of model-predicted decline probabilities.
+</figcaption>
+</figure>
+
+<p><strong>Recommended workflow:</strong></p>
 
 <ol>
 <li>Start with the highest-ranked pages.</li>
@@ -369,7 +418,12 @@ Recommended workflow:
 </ol>
 
 
-<h2>8. Artifacts</h2>
+<h2>8. Reproducibility and Artifacts</h2>
+
+<p>
+The analysis is implemented in the Capstone notebook under
+<code>work/notebooks/capstone.ipynb</code>.
+</p>
 
 <p>
 The analysis produced the following supporting artifacts:
@@ -384,8 +438,8 @@ The analysis produced the following supporting artifacts:
 </ul>
 
 <p>
-The numerical results reported on this page are generated from the completed capstone
-notebook and its artifact outputs.
+The numerical results reported on this page are generated from the completed
+capstone notebook and its artifact outputs.
 </p>
 
 
@@ -421,7 +475,7 @@ anonymized internship warehouse and project framework.
 
 <p>
 Data and project credit:
-<a href="https://flyrank.ai" target="_blank">https://flyrank.ai</a>
+<a href="https://flyrank.ai" target="_blank">FlyRank</a>
 </p>
 
 </footer>
